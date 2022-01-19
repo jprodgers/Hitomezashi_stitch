@@ -28,7 +28,7 @@ int strokeThickness = 5;
 //Here's your patterns. Use 1 or 0 to keep it simple, but any letter will work as well.
 //A,E,I,O,U,Y will all give a 1, all other chars a 0.
 //1 will start a line on the first stitch, 0 will skip and start on the second stich.
-String patternX = "010101010101010101010101010101";
+String patternX = "Jimmie Rodgers was here making art";
 String patternY = "010101010101010101010101010101";
 
 //If you like your image you can save it!
@@ -64,9 +64,8 @@ boolean RAINBOW_COLORS = true; //Rainbow gradient, it's fun.
 //Some line #s work better than others.
 boolean RAINBOW_OFFSET = false;
 
-
 int colorSpace = numXlines; //This will define the steps between colors.
-//Make a pretty color pattern if you like.
+//Make a pretty color pattern if you like. Kinda broken right now.
 color colors[] = {color(255, colorSpace, colorSpace), 
                   color(550, colorSpace, colorSpace), 
                   color(1000, colorSpace, colorSpace)};
@@ -77,7 +76,6 @@ int yWidth = numYlines * gap;
 int zWidth = numZlines * gap;
 int gapBorder = 0;
 int rainbowOffset = 0;
-boolean loopToggle = true;
 
 void setup() {
   /*
