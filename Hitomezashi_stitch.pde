@@ -9,6 +9,9 @@
  me longer to draw than to write this program. I just wanted to play
  around with the basic patterns, and to add arbitrary colors. Being
  that it's Genuary, I went ahead and wrote this. Enjoy!
+
+ Press S to save a frame.
+ Press L to start loop again.
  */
 
 //Didn't feel like rolling my own dashed lines, so here's a library.
@@ -25,28 +28,42 @@ int strokeThickness = 5;
 //Here's your patterns. Use 1 or 0 to keep it simple, but any letter will work as well.
 //A,E,I,O,U,Y will all give a 1, all other chars a 0.
 //1 will start a line on the first stitch, 0 will skip and start on the second stich.
-String patternX = "Jimmie";
-String patternY = "Rodgers";
+String patternX = "010101010101010101010101010101";
+String patternY = "010101010101010101010101010101";
 
 //If you like your image you can save it!
-boolean SAVE_IMAGE = false;
 boolean SAVE_ON_DRAW = false;
-int maxSaves = 30;
+int maxSaves = 120;
 String fileName = "hitomezashi_stitch-###.png";
 
-//Choose one or the other.
-boolean RANDOM_OFFSET = true; //Randomly offsets each row and column.
-boolean PATTERN_OFFSET = false; //Uses the pattern to offset.
+//Draws a single frame, and then delays. Useful to set the screen refresh.
+boolean DRAW_SINGLE = false;
+int delaySingle = 100;
+//Loops like normal, default should be false.
+//Use with DRAW_SINGLE to set the refresh rate.
+boolean LOOP_MODE = false;
+
+//Creates a gap around the stich pattern. It's currently manual,
+//so you have to make sure the line #s work out for screen width.
+//I'll make this automatic later.
 boolean GAP_BORDER = false;
 
-boolean DRAW_SINGLE = false;
-boolean DRAW_MANY = false;
+//Choose one or the other.
+boolean RANDOM_OFFSET = false; //Randomly offsets each row and column.
+boolean PATTERN_OFFSET = true; //Uses the pattern to offset.
+//If PATTERN_OFFSET is true, you can have it mutate each refresh.
+//Currently it just randomizes a single X and Y, so it won't always change.
+boolean PATTERN_MUTATE = true;
 
 //Choose one color method, otherwise it's single color.
 boolean RANDOM_COLORS = false; //Random colors for each row and column.
 boolean PATTERN_COLORS = false; //Uses colors[] to set the color
 boolean RAINBOW_COLORS = true; //Rainbow gradient, it's fun.
-boolean RAINBOW_OFFSET = true;
+//If RAINBOW_COLORS is true, you can have it move through a gradient.
+//It changes the colors each time based on the number of times called.
+//Some line #s work better than others.
+boolean RAINBOW_OFFSET = false;
+
 
 int colorSpace = numXlines; //This will define the steps between colors.
 //Make a pretty color pattern if you like.
@@ -60,6 +77,7 @@ int yWidth = numYlines * gap;
 int zWidth = numZlines * gap;
 int gapBorder = 0;
 int rainbowOffset = 0;
+boolean loopToggle = true;
 
 void setup() {
   /*
@@ -78,7 +96,7 @@ For fuck's sake processsing, why, why, WHY, the fuck do I have to put
   colorMode(HSB, colorSpace, 1, 1);
   if(GAP_BORDER) gapBorder = gap;
   noFill();
-  noLoop();
+  if(LOOP_MODE == false)noLoop();
 }
 
 void draw() {
@@ -138,10 +156,30 @@ void draw() {
     }
     dash.line(gapBorder+offset, y*gap+gapBorder, xWidth+gapBorder+offset, y*gap+gapBorder);
   }
-  if (DRAW_SINGLE)delay(500);
+  if (DRAW_SINGLE)delay(delaySingle);
   if(maxSaves>0 && SAVE_ON_DRAW){
     saveFrame(fileName);
     maxSaves--;
+  }
+  if (PATTERN_MUTATE){
+    String xTemp1 = "";
+    String xTemp2 = "";
+    String yTemp1 = "";
+    String yTemp2 = "";
+    int xBreak = int(random(patternX.length()));
+    int yBreak = int(random(patternY.length()));
+    xTemp1 = patternX.substring(xBreak);
+
+    if (xBreak>0) xTemp1 = patternX.substring(0, xBreak);
+    if (xBreak<patternX.length()) xTemp2 = patternX.substring(xBreak+1, patternX.length());
+    String xMutant = str(int(random(10)%2));
+    patternX = xTemp1 + xMutant + xTemp2;
+
+    if (yBreak>0) yTemp1 = patternY.substring(0, yBreak);
+    if (yBreak<patternY.length()) yTemp2 = patternY.substring(yBreak+1, patternY.length());
+    String yMutant = str(int(random(10)%2));
+    patternY = yTemp1 + yMutant + yTemp2;
+
   }
 }
 
@@ -149,12 +187,7 @@ void keyPressed() {
   if (key == 's' || key == 'S') {
     saveFrame(fileName);
   }
-}
-
-void mousePressed() {
-  loop();
-}
-
-void mouseReleased() {
-  noLoop();
+  if (key == 'l' || key == 'L'){
+    redraw();
+  }
 }
